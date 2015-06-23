@@ -40,6 +40,7 @@ info: $(TARGETS)
 clean:
 	rm -f $(TARGETS) *.o
 	rm -rf *.dSYM
+	rm -rf out nfcfs.pkg
 
 DYLD_LIBRARY_PATH=/usr/local/lib
 testmnt:
@@ -53,5 +54,10 @@ install: nfcfs
 	mkdir -p $(DESTDIR)/usr/local/bin
 	cp nfcfs $(DESTDIR)/usr/local/bin/
 	mkdir -p $(DESTDIR)/sbin
-	rm -r $(DESTDIR)/sbin/mount_nfcfs
-	ln -s $(DESTDIR)/usr/local/bin/nfcfs $(DESTDIR)/sbin/mount_nfcfs
+	rm -f $(DESTDIR)/sbin/mount_nfcfs
+	ln -s /usr/local/bin/nfcfs $(DESTDIR)/sbin/mount_nfcfs
+
+nfcfs.pkg: nfcfs
+	mkdir -p out
+	$(MAKE) install DESTDIR=out
+	productbuild  --content out/ $@
