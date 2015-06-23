@@ -31,10 +31,10 @@ nfcfs: nfcfs.c
 info: $(TARGETS)
 	@echo
 	@echo Compiled. The following is a typical way to run the loopback file system. In
-	@echo this example, /tmp/dir is an existing directory whose contents will become
-	@echo available in the existing mount point /Volumes/loop:
+	@echo this example, /tmp/sourcedir is an existing directory whose contents will become
+	@echo available in the existing mount point /Volumes/loop_mountpoint:
 	@echo
-	@echo "sudo ./nfcfs /Volumes/loop -omodules=threadid:subdir,subdir=/tmp/dir -oallow_other,native_xattr,volname=LoopbackFS"
+	@echo "sudo ./nfcfs /tmp/sourcedir /Volumes/loop_mountpoint -oallow_other,native_xattr,volname=LoopbackFS"
 	@echo
 
 clean:
