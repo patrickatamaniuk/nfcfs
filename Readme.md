@@ -78,5 +78,5 @@ as root `mkdir /mnt/mountpoint`
 
 /etc/fstab
 ```
-/tmp/sourcedir	/mnt/mountpoint	nfcfs	allow_other,native_xattr,volname=01Repos	0
+/tmp/sourcedir	/mnt/mountpoint	nfcfs	allow_other,native_xattr,volname=01Repos	0	0
 ```
