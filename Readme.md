@@ -62,12 +62,21 @@ Install
 -------
 
 ```
-sudo cp fuse/nfcfs /usr/local/bin
+cd fuse && sudo make install
 ```
 
 Usage
 -----
 
 ```
-$ sudo nfcfs _mountpoint_ -omodules=threadid:subdir,subdir=${HOME}/some_directory -oallow_other,native_xattr,volname=nfcFS
+$ sudo nfcfs /tmp/sourcedir /Volumes/loop_mountpoint -oallow_other,native_xattr,volname=LoopbackFS
+```
+
+in fstab:
+
+as root `mkdir /mnt/mountpoint`
+
+/etc/fstab
+```
+/tmp/sourcedir	/mnt/mountpoint	nfcfs	allow_other,native_xattr,volname=01Repos	0
 ```

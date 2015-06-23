@@ -1,2 +1,4 @@
 *-src.tgz
 icu-*.pkg
+fuse/nfcfs
+*.dSYM

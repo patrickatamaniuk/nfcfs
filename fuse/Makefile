@@ -48,3 +48,10 @@ testmntdbg:
 	sudo DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH) ./nfcfs ${HOME}/.repos-export ${HOME}/mnt/1 -d -oallow_other,native_xattr,volname=nfcFS
 testumnt:
 	sudo umount ${HOME}/mnt/1
+
+install: nfcfs
+	mkdir -p $(DESTDIR)/usr/local/bin
+	cp nfcfs $(DESTDIR)/usr/local/bin/
+	mkdir -p $(DESTDIR)/sbin
+	rm -r $(DESTDIR)/sbin/mount_nfcfs
+	ln -s $(DESTDIR)/usr/local/bin/nfcfs $(DESTDIR)/sbin/mount_nfcfs
