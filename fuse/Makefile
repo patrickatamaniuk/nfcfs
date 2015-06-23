@@ -43,8 +43,8 @@ clean:
 
 DYLD_LIBRARY_PATH=/usr/local/lib
 testmnt:
-	sudo ./nfcfs ${HOME}/mnt/1 -omodules=threadid:subdir,subdir=${HOME}/.repos-export -oallow_other,native_xattr,volname=nfcFS
+	sudo ./nfcfs ${HOME}/.repos-export  ${HOME}/mnt/1 -oallow_other,native_xattr,volname=nfcFS
 testmntdbg:
-	sudo DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH) ./nfcfs -d ${HOME}/mnt/1 -omodules=threadid:subdir,subdir=${HOME}/.repos-export -oallow_other,native_xattr,volname=nfcFS
+	sudo DYLD_LIBRARY_PATH=$(DYLD_LIBRARY_PATH) ./nfcfs ${HOME}/.repos-export ${HOME}/mnt/1 -d -oallow_other,native_xattr,volname=nfcFS
 testumnt:
 	sudo umount ${HOME}/mnt/1

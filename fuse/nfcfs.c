@@ -1045,9 +1045,56 @@ static struct fuse_operations loopback_oper = {
 #endif
 };
 
+int loop_subdir = 0;
+
+static void usage(const char *progname)
+{
+	printf(
+"usage: %s source-directory mountpoint [options]\n"
+"\n"
+"general options:\n"
+"    -o opt,[opt...]        mount options\n"
+"    -h   --help            print help\n"
+"    -V   --version         print version\n"
+"\n", progname);
+}
+enum {  KEY_NONE,
+	KEY_CASE_INS,
+	KEY_HELP,
+};
+
+static int loopback_opt_proc(void *data, const char *arg, int key,
+                          struct fuse_args *outargs)
+{
+	char *tmp;
+	//(void) data;
+	switch (key) {
+
+            case FUSE_OPT_KEY_NONOPT:
+                if (!loop_subdir && strchr(arg, '/')) {
+			loop_subdir = 1;
+                    tmp = malloc(strlen(arg)+255);
+                    sprintf(tmp, "-omodules=threadid:subdir,subdir=%s", arg);
+                    fuse_opt_add_arg(outargs, tmp);
+                    free(tmp);
+                    return 0;
+		}
+		return 1;
+            case KEY_HELP:
+		usage(outargs->argv[0]);
+		fuse_opt_add_arg(outargs, "-ho");
+		fuse_main(outargs->argc, outargs->argv, &loopback_oper, NULL);
+		exit(1);
+            default:
+                return 1;
+        }
+}
+
 static const struct fuse_opt loopback_opts[] = {
-	{ "case_insensitive", offsetof(struct loopback, case_insensitive), 1 },
-	FUSE_OPT_END
+	{ "case_insensitive", offsetof(struct loopback, case_insensitive), KEY_CASE_INS },
+        FUSE_OPT_KEY("-h",             KEY_HELP),
+	FUSE_OPT_KEY("--help",         KEY_HELP),
+        FUSE_OPT_END
 };
 
 int
@@ -1057,7 +1104,7 @@ main(int argc, char *argv[])
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 
     loopback.case_insensitive = 0;
-    if (fuse_opt_parse(&args, &loopback, loopback_opts, NULL) == -1) {
+    if (fuse_opt_parse(&args, &loopback, loopback_opts, loopback_opt_proc) == -1) {
 		exit(1);
     }
 
