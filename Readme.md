@@ -23,7 +23,13 @@ cd icu && make
 
 2. Install the resulting pkg file
 
+```
+sudo installer -pkg icu/icu-55_1.pkg -target /
+```
+
 3. Compile the fuse filesystem
+
+This requires installed osxfuse and icu
 
 ```
 cd fuse && make
