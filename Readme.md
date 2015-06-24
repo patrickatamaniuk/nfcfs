@@ -28,6 +28,7 @@ Status of the code
 ------------------
 
 This is quite experimental and not well tested yet. Feedback is very welcome.
+The current tested version is 0.9, the latest code will be 0.9.1
 
 Prerequisites
 -------------

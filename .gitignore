@@ -2,5 +2,5 @@
 icu-*.pkg
 fuse/nfcfs
 *.dSYM
-fuse/nfcfs.pkg
+fuse/nfcfs-*.pkg
 fuse/out

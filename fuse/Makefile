@@ -1,7 +1,7 @@
 LDFLAGS=-L/usr/local/lib -licui18n -licuuc -licudata -licuio
 CFLAGS=-I${HOME}/usr/local/include
 
-
+VERSION = 0.9.1
 TARGETS = nfcfs
 
 # Root for OSXFUSE includes and libraries
@@ -40,7 +40,7 @@ info: $(TARGETS)
 clean:
 	rm -f $(TARGETS) *.o
 	rm -rf *.dSYM
-	rm -rf out nfcfs.pkg
+	rm -rf out nfcfs-*.pkg
 
 DYLD_LIBRARY_PATH=/usr/local/lib
 testmnt:
@@ -57,7 +57,10 @@ install: nfcfs
 	rm -f $(DESTDIR)/sbin/mount_nfcfs
 	ln -s /usr/local/bin/nfcfs $(DESTDIR)/sbin/mount_nfcfs
 
-nfcfs.pkg: nfcfs
+pkg: nfcfs-$(VERSION).pkg
+nfcfs-$(VERSION).pkg: nfcfs
 	mkdir -p out
 	$(MAKE) install DESTDIR=out
 	productbuild  --content out/ $@
+
+.PHONY: pkg
