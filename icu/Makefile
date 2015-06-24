@@ -12,7 +12,7 @@ icu-$(VER).pkg: icu4c-$(VER)-src.tgz out/usr/local/bin/icu-config
 	productbuild  --content out/ icu-$(VER).pkg
 
 icu4c-$(VER)-src.tgz:
-	curl -O$@ http://download.icu-project.org/files/icu4c/55.1/icu4c-$(VER)-src.tgz
+	curl -o $@ http://download.icu-project.org/files/icu4c/55.1/icu4c-$(VER)-src.tgz
 
 clean:
 	rm -rf out icu
