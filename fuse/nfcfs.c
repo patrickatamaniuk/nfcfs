@@ -63,6 +63,8 @@ typedef unsigned long  u_long;
 
 struct loopback {
 	int case_insensitive;
+        int loop_subdir;
+        const struct UNormalizer2* normalizer;
 };
 
 static struct loopback loopback;
@@ -111,22 +113,27 @@ void hexdump (const void *addr, unsigned long len) {
 
 #endif
 
-int normalize(const char *name, char *output, unsigned long len) {
+/**
+ * normalize an utf-8 string to Normal Form C NFC.
+ * Arguments:
+ * char * name the name to normalize
+ * char * output the normalized name. Must be allocated with at least as much memory as len
+ *
+ */
+static int
+normalize(const char *name, char *output, const size_t len) {
     UChar *str, *normalized;
     UErrorCode err = U_ZERO_ERROR;
-
-    const UNormalizer2* normalizer;
-    normalizer = unorm2_getNFCInstance(&err); //returns a singleton instance. Do not delete it. http://icu-project.org/apiref/icu4c/unorm2_8h.html#aa5578c95c23f6a859525e2645f84c56b
-    if(U_FAILURE(err)) { return err; }
+    const size_t utflen = len*3; // alloc 3 times, as nfd decomposes mostly into three bytes. Double decompositions are out of luck. FIXME
 
     //convert name into UTF-16 str
-    str = malloc(len*2);
-    u_strFromUTF8(str, len*2, NULL, name, -1, &err);
+    str = malloc(utflen);
+    u_strFromUTF8(str, utflen, NULL, name, -1, &err);
     if(U_FAILURE(err)) { free(str); return err; }
 
     //normalize utf16 str
-    normalized = malloc(len*2);
-    unorm2_normalize(normalizer, str, u_strlen(str), normalized, len*2, &err);
+    normalized = malloc(utflen); // len*2 should be sufficient as nfc is 2 byte each char.
+    unorm2_normalize(loopback.normalizer, str, u_strlen(str), normalized, utflen, &err);
     if(U_FAILURE(err)) { free(str); free(normalized); return err; }
     u_strToUTF8(output, len, NULL, normalized, u_strlen(normalized), &err);
     if(U_FAILURE(err)) { free(str); free(normalized); return err; }
@@ -1045,8 +1052,6 @@ static struct fuse_operations loopback_oper = {
 #endif
 };
 
-int loop_subdir = 0;
-
 static void usage(const char *progname)
 {
 	printf(
@@ -1067,12 +1072,11 @@ static int loopback_opt_proc(void *data, const char *arg, int key,
                           struct fuse_args *outargs)
 {
 	char *tmp;
-	//(void) data;
 	switch (key) {
 
             case FUSE_OPT_KEY_NONOPT:
-                if (!loop_subdir && strchr(arg, '/')) {
-			loop_subdir = 1;
+                if (!loopback.loop_subdir && strchr(arg, '/')) {
+			loopback.loop_subdir = 1;
                     tmp = malloc(strlen(arg)+255);
                     sprintf(tmp, "-omodules=threadid:subdir,subdir=%s", arg);
                     fuse_opt_add_arg(outargs, tmp);
@@ -1103,10 +1107,17 @@ main(int argc, char *argv[])
     int res = 0;
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 
+    loopback.loop_subdir = 0;
     loopback.case_insensitive = 0;
     if (fuse_opt_parse(&args, &loopback, loopback_opts, loopback_opt_proc) == -1) {
 		exit(1);
     }
+
+    // Instantiate unicode normalizer. This is a singleton.
+    // Do not delete it. http://icu-project.org/apiref/icu4c/unorm2_8h.html#aa5578c95c23f6a859525e2645f84c56b
+    UErrorCode err = U_ZERO_ERROR;
+    loopback.normalizer = unorm2_getNFCInstance(&err);
+    if(U_FAILURE(err)) { exit(2); }
 
     umask(0);
     res = fuse_main(args.argc, args.argv, &loopback_oper, NULL);
