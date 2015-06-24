@@ -80,3 +80,8 @@ as root `mkdir /mnt/mountpoint`
 ```
 /tmp/sourcedir	/mnt/mountpoint	nfcfs	allow_other,native_xattr,volname=01Repos	0	0
 ```
+
+Issues
+------
+
+Of course this fixes only the filesystem layer. When operating directly on a repository using an svn client, the user must take care not to enter NFD normalized data when renaming or tagging/branching objects. First tests show that typing Umlauts won't be a problem, the input is NFC normalized. But copy-pasting from the console listing will be a problem. The user should be aware of that (unless the client software mitigates that. But there is none afaik).
