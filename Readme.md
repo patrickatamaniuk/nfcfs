@@ -1,7 +1,7 @@
-Passthrough filesystem for OS X
+Normalizing filesystem for OS X
 ===============================
 
-which normalizes directory listings to unicode normal form C (NFC).
+which normalizes directory listings to unicode normal form C (NFC) based on OSXFUSE.
 Useful for subversion and other tools in context with Umlauts and other unicode issues on mixed OS environments.
 
 The Problem
@@ -34,6 +34,9 @@ Prerequisites
 
 Install a current osxfuse (2.7.5 currently)
 You get it from https://osxfuse.github.io/
+
+To compile the filesystem and prerequisites, you need the xtools commandline tools.
+Install them with ```xcode-select --install```
 
 Building
 --------
@@ -85,3 +88,9 @@ Issues
 ------
 
 Of course this fixes only the filesystem layer. When operating directly on a repository using an svn client, the user must take care not to enter NFD normalized data when renaming or tagging/branching objects. First tests show that typing Umlauts won't be a problem, the input is NFC normalized. But copy-pasting from the console listing will be a problem. The user should be aware of that (unless the client software mitigates that. But there is none afaik).
+
+Other Implementations
+---------------------
+
+After writing this i found a quite similar approach written by Thomas Andersson. Check it out here: http://nfcfs.sourceforge.net/
+It does not require the icu libraries but it is based on MacFUSE which is no longer maintained.
