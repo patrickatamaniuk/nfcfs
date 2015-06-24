@@ -62,8 +62,17 @@ typedef unsigned long  u_long;
 #define XATTR_APPLE_PREFIX             "com.apple."
 
 struct loopback {
+        /**
+         * option, enables case_insensitivity. Not really required, we just pass all stuff through from base fs layer
+         */
 	int case_insensitive;
+        /**
+         * internal semaphore for argument parsing
+         */
         int loop_subdir;
+        /**
+         * internal singleton used to normalize strings
+         */
         const struct UNormalizer2* normalizer;
 };
 
@@ -110,7 +119,6 @@ void hexdump (const void *addr, unsigned long len) {
     // And print the final ASCII bit.
     printf ("  %s\n\n", buff);
 }
-
 #endif
 
 /**
@@ -118,7 +126,11 @@ void hexdump (const void *addr, unsigned long len) {
  * Arguments:
  * char * name the name to normalize
  * char * output the normalized name. Must be allocated with at least as much memory as len
+ * size_t len specify allocated output length. Also indicates the name length, used to allocate memory for temporary utf-16 representations.
  *
+ * Returns:
+ * 0 on success
+ * not 0 on utf operation error. See icu source/common/unicode/utypes.h
  */
 static int
 normalize(const char *name, char *output, const size_t len) {
@@ -1063,6 +1075,7 @@ static void usage(const char *progname)
 "    -V   --version         print version\n"
 "\n", progname);
 }
+
 enum {  KEY_NONE,
 	KEY_CASE_INS,
 	KEY_HELP,
